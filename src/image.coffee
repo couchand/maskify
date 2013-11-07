@@ -43,7 +43,28 @@ composite = (opts) ->
         .in(opts.base)
         .write opts.out, opts.error
 
+smart = (opts) ->
+    fout = opts.out
+    success = opts.success
+    success ?= ->
+
+    delete opts.out
+    opts.success = ->
+        opts.in = opts.out
+        delete opts.out
+        opts.success = ->
+            opts.change = opts.out
+            opts.out = fout
+            opts.success = success
+
+            composite opts
+
+        rotate opts
+
+    scale opts
+
 module.exports =
     composite: composite
     rotate: rotate
     scale: scale
+    smart: smart
